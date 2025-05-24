@@ -5,6 +5,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_email = db.Column(db.String(190), unique=True, nullable=False)
     user_password = db.Column(db.String(128), nullable=False)
+    user_name = db.Column(db.String(128))
     is_admin = db.Column(db.Boolean, default=False)
 
 
