@@ -1,9 +1,11 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from src.database import db
 from src.bycrypt import bcrypt
 from src.routes.user_route import user_app
 from src.routes.log_route import log_app
+
 
 
 app = Flask(__name__)
@@ -14,7 +16,7 @@ db.init_app(app)
 bcrypt.init_app(app)
 jwt = JWTManager()
 jwt.init_app(app)
-
+CORS(app)
 
 with app.app_context():
     db.create_all()

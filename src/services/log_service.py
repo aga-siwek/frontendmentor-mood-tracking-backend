@@ -15,7 +15,29 @@ def get_current_user():
     user = User.query.filter_by(user_id=current_user).first()
     return user
 
+def add_mood_name(mood_scale):
+    if mood_scale == -2:
+        return "Very Sad"
+    elif mood_scale == -1:
+        return "Sad"
+    elif mood_scale == 0:
+        return "Neutral"
+    elif mood_scale == 1:
+        return "Happy"
+    elif mood_scale == 2:
+        return "Very Happy"
 
+def add_sleep_time(sleep_time_scale):
+    if sleep_time_scale == 0:
+        return "0-2 hours"
+    elif sleep_time_scale == 1:
+        return "3-4 hours"
+    elif sleep_time_scale == 2:
+        return "5-6 hours"
+    elif sleep_time_scale == 3:
+        return "7-8 hours"
+    elif sleep_time_scale == 4:
+        return "9+ hours"
 def get_all_logs():
     logged_user = get_current_user()
     if not logged_user:
@@ -26,9 +48,66 @@ def get_all_logs():
     logs_dict = [log.to_dict() for log in logs]
     return (logs_dict, 200)
 
-
-def create_log(feels, mood, sleep, description):
+def get_all_user_logs(user_id):
     logged_user = get_current_user()
+    if not logged_user:
+        return jsonify({"description": "not user found"})
+    if not logged_user.is_administrator():
+        return jsonify({"description": "Unauthorized"}), 401
+    user_logs = Log.query.filter_by(user_id=int(user_id))
+    logs_dict = [log.to_dict() for log in user_logs]
+    for log_dict in logs_dict:
+        moods = Mood.query.filter_by(log_id = log_dict["log_id"])
+        mood_to_dict = moods[0].to_dict()
+        log_dict["mood"] = mood_to_dict
+
+        all_feels = Feel.query.filter_by(log_id = log_dict["log_id"])
+        feels_to_dict = [feels.to_dict() for feels in all_feels]
+        log_dict["feels"] = feels_to_dict
+
+        times_sleep = Sleep.query.filter_by(log_id = log_dict["log_id"])
+        times_to_dict = times_sleep[0].to_dict()
+        log_dict["sleep"] = times_to_dict
+
+        descriptions = Description.query.filter_by(log_id = log_dict["log_id"])
+        description_to_dict = descriptions.to_dict()
+        log_dict["description"] = description_to_dict
+    print(logs_dict)
+    return (logs_dict, 200)
+
+def get_all_me_logs():
+    logged_user = get_current_user()
+    if not logged_user:
+        return jsonify({"description": "not user found"})
+    print(logged_user)
+    user_logs = Log.query.filter_by(user_id=logged_user.user_id)
+    logs_dict = [log.to_dict() for log in user_logs]
+    for log_dict in logs_dict:
+        moods = Mood.query.filter_by(log_id=log_dict["log_id"])
+        mood_to_dict = moods[0].to_dict()
+        log_dict["mood"] = mood_to_dict
+
+        all_feels = Feel.query.filter_by(log_id=log_dict["log_id"])
+        feels_to_dict = [feels.to_dict() for feels in all_feels]
+        log_dict["feels"] = feels_to_dict
+
+        times_sleep = Sleep.query.filter_by(log_id=log_dict["log_id"])
+        times_to_dict = times_sleep[0].to_dict()
+        log_dict["sleep"] = times_to_dict
+
+        descriptions = Description.query.filter_by(log_id=log_dict["log_id"])
+        description_to_dict = descriptions[0].to_dict()
+        log_dict["description"] = description_to_dict
+    print(logs_dict)
+    return (logs_dict, 200)
+
+
+
+
+def create_log(feels, mood_scale, sleep_time_scale, description):
+    logged_user = get_current_user()
+    mood_name = add_mood_name(mood_scale)
+    sleep_time_name = add_sleep_time(sleep_time_scale)
 
     if not logged_user:
         return jsonify({"description": "not user found"}, 401)
@@ -48,14 +127,16 @@ def create_log(feels, mood, sleep, description):
 
     new_mood = Mood(
         log_id=new_log.log_id,
-        mood_name=mood
+        mood_scale=mood_scale,
+        mood_name=mood_name
     )
     db.session.add(new_mood)
     db.session.commit()
 
     new_sleep = Sleep(
         log_id=new_log.log_id,
-        sleep_time=sleep
+        sleep_time_scale=sleep_time_scale,
+        sleep_time_name=sleep_time_name
     )
     db.session.add(new_sleep)
     db.session.commit()
@@ -68,7 +149,7 @@ def create_log(feels, mood, sleep, description):
         db.session.add(new_feel)
         db.session.commit()
 
-    return jsonify({"new_log": new_log.to_dict(), "new_description": new_description.to_dict()}, 200)
+    return jsonify({"new_log": new_log.to_dict(), "new_mood": new_mood.to_dict(),"new_feels": feels, "new_sleep":new_sleep.to_dict(), "new_description": new_description.to_dict()}, 200)
 
 
 def get_single_log(log_id):
@@ -81,7 +162,6 @@ def get_single_log(log_id):
             return jsonify({"description": "Unauthorized"}), 401
 
     return (searched_log.to_dict(), 200)
-
 
 
 def change_single_log(data, log_id):
@@ -109,17 +189,22 @@ def change_single_log(data, log_id):
         db.session.commit()
         new_log_information["description"] = current_description.to_dict()
 
-    if "mood" in data.keys():
+    if "mood_scale" in data.keys():
+        mood_name = add_mood_name(data["mood_scale"])
         current_mood = Mood.query.filter_by(log_id=log_id).first()
-        current_mood.mood_name = data["mood"]
+        current_mood.mood_scale: object = data["mood_scale"]
+        current_mood.mood_name: object = mood_name
         db.session.commit()
         new_log_information["mood"] = current_mood.to_dict()
 
-    if "sleep" in data.keys():
+    if "sleep_time_scale" in data.keys():
+        sleep_time_name = add_sleep_time(data["sleep_time_scale"])
         current_sleep = Sleep.query.filter_by(log_id=log_id).first()
-        current_sleep.sleep_time = data["sleep"]
+        current_sleep.sleep_time_scale = data["sleep_time_scale"]
+        current_sleep.sleep_time_name = sleep_time_name
+
         db.session.commit()
-        new_log_information["sleep"] = current_mood.to_dict()
+        new_log_information["sleep"] = current_sleep.to_dict()
 
     if "feel" in data.keys():
         if data["feel"]:

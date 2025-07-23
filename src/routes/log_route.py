@@ -7,17 +7,30 @@ log_app = Blueprint("logs", __name__)
 @log_app.route("/logs/", methods=["POST"])
 @jwt_required()
 def add_log():
+
     post_data = request.json
     feels = post_data["feel"]
-    mood = post_data["mood"]
-    sleep = post_data["sleep"]
+    mood_scale = post_data["mood_scale"]
+    sleep_time_scale = post_data["sleep_time_scale"]
     description = post_data["description"]
-    return log_service.create_log(feels, mood, sleep, description)
+
+    return log_service.create_log(feels, mood_scale, sleep_time_scale, description)
 
 @log_app.route("/logs/", methods=["GET"])
 @jwt_required()
 def list_logs():
     return log_service.get_all_logs()
+
+
+@log_app.route("/logs/users/<user_id>", methods=["GET"])
+@jwt_required()
+def list_user_logs(user_id):
+    return log_service.get_all_user_logs(user_id)
+
+@log_app.route("/logs/users/me", methods=["GET"])
+@jwt_required()
+def list_me_logs():
+    return log_service.get_all_me_logs()
 
 @log_app.route("/logs/<log_id>", methods=["GET"])
 @jwt_required()

@@ -12,6 +12,11 @@ class Log(db.Model):
         return {
             "log_id": self.log_id,
             "user_id": self.user_id,
-            "created_at": self.created_at
+            "created_at": self.created_at,
+            "created_at_year": self.created_at.year,
+            "created_at_month": self.created_at.month,
+            "created_at_day": self.created_at.day,
+            "created_at_hour": self.created_at.hour,
+            "created_at_minute": self.created_at.minute,
         }
 
