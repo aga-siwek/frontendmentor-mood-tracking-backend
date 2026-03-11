@@ -74,6 +74,7 @@ def change_single_user(data, user_id):
         return jsonify({"description": "Unauthorized"}), 401
 
     try:
+        print(data, "data from user service")
 
         if "user_email" in data.keys():
             changed_user.user_email = data["user_email"]
@@ -91,6 +92,7 @@ def change_single_user(data, user_id):
 
 def change_me_user(data):
     logged_user = get_current_user()
+    print(f"Dane wejściowe: {data}")
 
     if not logged_user:
         return jsonify({"description": "not user found"})
@@ -98,6 +100,8 @@ def change_me_user(data):
     try:
         if "user_email" in data.keys():
             logged_user.user_email = data["user_email"]
+        if "user_name" in data.keys():
+            logged_user.user_name = data["user_name"]
         if "user_password" in data.keys():
             logged_user.user_password = data["user_password"]
 

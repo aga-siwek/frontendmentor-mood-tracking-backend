@@ -9,7 +9,7 @@ def register():
     post_data = request.json
     user_email = post_data["user_email"]
     user_password = post_data["user_password"]
-    is_admin = False
+    is_admin = True
     return user_service.create_user(user_email, user_password, is_admin)
 
 
@@ -49,6 +49,7 @@ def change_single_user(user_id):
 @user_app.route("/users/me", methods=["PUT"])
 @jwt_required()
 def change_me_user():
+    print("start change me user")
     put_request = request.json
     return user_service.change_me_user(put_request)
 
