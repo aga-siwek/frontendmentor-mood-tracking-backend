@@ -24,7 +24,7 @@ def login(user_email, password):
     user = User.query.filter_by(user_email=user_email).first()
     if user and bcrypt.check_password_hash(user.user_password, password):
         access_token = create_access_token(identity=str(user.user_id))
-        return jsonify({"message": "Login Success", "access_token": access_token, "user_name": user.user_name})
+        return jsonify({"message": "Login Success", "access_token": access_token, "user_name": user.user_name, "user_email": user_email})
     return jsonify({"description": "Access Denied: bad login or password"}), 401
 
 def get_current_user():
@@ -92,7 +92,6 @@ def change_single_user(data, user_id):
 
 def change_me_user(data):
     logged_user = get_current_user()
-    print(f"Dane wejściowe: {data}")
 
     if not logged_user:
         return jsonify({"description": "not user found"})

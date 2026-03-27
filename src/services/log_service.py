@@ -1,5 +1,4 @@
 from flask_jwt_extended import get_jwt_identity
-
 from src.database import db
 from src.models.log import Log
 from src.models.user import User
@@ -55,6 +54,8 @@ def get_all_user_logs(user_id):
     if not logged_user.is_administrator():
         return jsonify({"description": "Unauthorized"}), 401
     user_logs = Log.query.filter_by(user_id=int(user_id))
+    if not user_logs:
+        return jsonify({"description": "not user logs"})
     logs_dict = [log.to_dict() for log in user_logs]
     for log_dict in logs_dict:
         moods = Mood.query.filter_by(log_id = log_dict["log_id"])
@@ -72,34 +73,61 @@ def get_all_user_logs(user_id):
         descriptions = Description.query.filter_by(log_id = log_dict["log_id"])
         description_to_dict = descriptions.to_dict()
         log_dict["description"] = description_to_dict
-    print(logs_dict)
     return (logs_dict, 200)
 
 def get_all_me_logs():
     logged_user = get_current_user()
     if not logged_user:
         return jsonify({"description": "not user found"})
-    print(logged_user)
-    user_logs = Log.query.filter_by(user_id=logged_user.user_id)
-    logs_dict = [log.to_dict() for log in user_logs]
-    for log_dict in logs_dict:
-        moods = Mood.query.filter_by(log_id=log_dict["log_id"])
-        mood_to_dict = moods[0].to_dict()
-        log_dict["mood"] = mood_to_dict
+    user_logs = Log.query.filter_by(user_id=logged_user.user_id).all()
+    if not user_logs:
+        return jsonify([]), 200
+    print("user logs", user_logs)
 
-        all_feels = Feel.query.filter_by(log_id=log_dict["log_id"])
-        feels_to_dict = [feels.to_dict() for feels in all_feels]
-        log_dict["feels"] = feels_to_dict
+    logs_final_list = []
 
-        times_sleep = Sleep.query.filter_by(log_id=log_dict["log_id"])
-        times_to_dict = times_sleep[0].to_dict()
-        log_dict["sleep"] = times_to_dict
+    for log in user_logs:
 
-        descriptions = Description.query.filter_by(log_id=log_dict["log_id"])
-        description_to_dict = descriptions[0].to_dict()
-        log_dict["description"] = description_to_dict
-    print(logs_dict)
-    return (logs_dict, 200)
+        log_data = log.to_dict()
+        log_id = log_data["log_id"]
+
+        mood_obj = Mood.query.filter_by(log_id=log_id).first()
+        log_data["mood"] = mood_obj.to_dict() if mood_obj else None
+
+        sleep_obj = Sleep.query.filter_by(log_id=log_id).first()
+        log_data["sleep"] = sleep_obj.to_dict() if sleep_obj else None
+
+        desc_obj = Description.query.filter_by(log_id=log_id).first()
+        log_data["description"] = desc_obj.to_dict() if desc_obj else None
+
+        all_feels = Feel.query.filter_by(log_id=log_id).all()
+        log_data["feels"] = [f.to_dict() for f in all_feels]
+
+        logs_final_list.append(log_data)
+
+    return jsonify(logs_final_list), 200
+
+
+
+    # logs_dict = [log.to_dict() for log in user_logs]
+    # for log_dict in logs_dict:
+    #     moods = Mood.query.filter_by(log_id=log_dict["log_id"])
+    #     mood_to_dict = moods[0].to_dict()
+    #     log_dict["mood"] = mood_to_dict
+
+    #     all_feels = Feel.query.filter_by(log_id=log_dict["log_id"])
+    #     feels_to_dict = [feels.to_dict() for feels in all_feels]
+    #     log_dict["feels"] = feels_to_dict
+
+    #     times_sleep = Sleep.query.filter_by(log_id=log_dict["log_id"])
+    #     times_to_dict = times_sleep[0].to_dict()
+    #     log_dict["sleep"] = times_to_dict
+
+    #     descriptions = Description.query.filter_by(log_id=log_dict["log_id"])
+    #     description_to_dict = descriptions[0].to_dict()
+    #     log_dict["description"] = description_to_dict
+ 
+    # return (logs_dict, 200)
 
 
 
