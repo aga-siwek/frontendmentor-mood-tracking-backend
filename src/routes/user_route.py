@@ -9,7 +9,7 @@ def register():
     post_data = request.json
     user_email = post_data["user_email"]
     user_password = post_data["user_password"]
-    is_admin = True
+    is_admin = False
     return user_service.create_user(user_email, user_password, is_admin)
 
 
