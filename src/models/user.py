@@ -14,7 +14,7 @@ class User(db.Model):
             "user_id": self.user_id,
             "user_email": self.user_email,
             "is_admin": self.is_admin,
-            "user_name": self.is_admin
+            "user_name": self.user_name
         }
 
     def is_administrator(self):

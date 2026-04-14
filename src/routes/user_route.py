@@ -49,6 +49,7 @@ def change_single_user(user_id):
 @user_app.route("/users/me", methods=["PUT"])
 @jwt_required()
 def change_me_user():
+    print("start change me user")
     put_request = request.json
     return user_service.change_me_user(put_request)
 
