@@ -2,7 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from src.database import db
-from src.bycrypt import bcrypt
+from src.bcrypt import bcrypt
 from src.routes.user_route import user_app
 from src.routes.log_route import log_app
 
