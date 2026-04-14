@@ -59,7 +59,7 @@ def change_me_user():
 def delete_single_user(user_id):
     return user_service.delete_single_user(user_id)
 
-#for user
+#for user t
 @user_app.route("/users/me", methods=["DELETE"])
 @jwt_required()
 def delete_me_user():
