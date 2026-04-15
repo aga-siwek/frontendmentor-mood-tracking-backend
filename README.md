@@ -83,7 +83,17 @@ source .venv/bin/activate
 
 install project dependencies
 
-`pip install .`
+`pip install -r requirements.txt`
+
+set up environment variables
+
+create a `.env` file in the root directory:
+
+```
+DATABASE_URL=your_database_url
+SECRET_KEY=your_secret_key
+JWT_SECRET_KEY=your_jwt_secret_key
+```
 
 ## How to run server
 
@@ -91,12 +101,12 @@ you can start flask application by several different way:
 
 run as python script
 
-`python src/app.py`
+`python3 app.py`
 
 run with flask
 
-`python -m flask --app src/app/app.py run --host 0.0.0.0 --port 8080`
+`python3 -m flask --app app.py run --host 0.0.0.0 --port 8080`
 
 run with flask (with debug & autoreload)
 
-`python -m flask --app src/app/app.py --debug run --host 0.0.0.0 --port 8080`
+`python3 -m flask --app app.py --debug run --host 0.0.0.0 --port 8080`
