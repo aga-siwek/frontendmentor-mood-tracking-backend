@@ -29,7 +29,6 @@ def login(user_email, password):
 
 def get_current_user():
     current_user = get_jwt_identity()
-    print(current_user)
     user = User.query.filter_by(user_id=current_user).first()
     return user
 
