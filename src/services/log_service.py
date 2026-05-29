@@ -138,7 +138,7 @@ def create_log(feels, mood_scale, sleep_time_scale, description):
     sleep_time_name = add_sleep_time(sleep_time_scale)
 
     if not logged_user:
-        return jsonify({"description": "not user found"}, 401)
+        return jsonify({"description": "not user found"}), 401
 
     new_log = Log(
         user_id=logged_user.user_id)
@@ -177,7 +177,7 @@ def create_log(feels, mood_scale, sleep_time_scale, description):
         db.session.add(new_feel)
         db.session.commit()
 
-    return jsonify({"new_log": new_log.to_dict(), "new_mood": new_mood.to_dict(),"new_feels": feels, "new_sleep":new_sleep.to_dict(), "new_description": new_description.to_dict()}, 200)
+    return jsonify({"new_log": new_log.to_dict(), "new_mood": new_mood.to_dict(), "new_feels": feels, "new_sleep": new_sleep.to_dict(), "new_description": new_description.to_dict()}), 200
 
 
 def get_single_log(log_id):
