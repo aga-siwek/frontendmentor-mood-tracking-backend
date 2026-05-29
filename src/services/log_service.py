@@ -143,39 +143,30 @@ def create_log(feels, mood_scale, sleep_time_scale, description):
     new_log = Log(
         user_id=logged_user.user_id)
     db.session.add(new_log)
-    db.session.commit()
+    db.session.flush()
 
     new_description = Description(
         log_id=new_log.log_id,
         description=description
     )
-
-    db.session.add(new_description)
-    db.session.commit()
-
     new_mood = Mood(
         log_id=new_log.log_id,
         mood_scale=mood_scale,
         mood_name=mood_name
     )
-    db.session.add(new_mood)
-    db.session.commit()
-
     new_sleep = Sleep(
         log_id=new_log.log_id,
         sleep_time_scale=sleep_time_scale,
         sleep_time_name=sleep_time_name
     )
+    db.session.add(new_description)
+    db.session.add(new_mood)
     db.session.add(new_sleep)
-    db.session.commit()
 
     for feel in feels:
-        new_feel = Feel(
-            log_id=new_log.log_id,
-            feel_name=feel
-        )
-        db.session.add(new_feel)
-        db.session.commit()
+        db.session.add(Feel(log_id=new_log.log_id, feel_name=feel))
+
+    db.session.commit()
 
     return jsonify({"new_log": new_log.to_dict(), "new_mood": new_mood.to_dict(), "new_feels": feels, "new_sleep": new_sleep.to_dict(), "new_description": new_description.to_dict()}), 200
 
