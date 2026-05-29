@@ -3,17 +3,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-
 class Config:
     database_url = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
     # Render provides URL with 'postgres://' prefix, SQLAlchemy requires 'postgresql://'
     SQLALCHEMY_DATABASE_URI = database_url.replace('postgres://', 'postgresql://', 1)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_pre_ping": True,
-        "pool_recycle": 280,
-    }
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev_secret_key')
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'dev_jwt_secret_key')
     JWT_TOKEN_LOCATION = ['headers']
