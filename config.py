@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
 class Config:
     database_url = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
     # Render provides URL with 'postgres://' prefix, SQLAlchemy requires 'postgresql://'
