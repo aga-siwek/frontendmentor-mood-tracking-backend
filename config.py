@@ -10,6 +10,10 @@ class Config:
     # Render provides URL with 'postgres://' prefix, SQLAlchemy requires 'postgresql://'
     SQLALCHEMY_DATABASE_URI = database_url.replace('postgres://', 'postgresql://', 1)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 280,
+    }
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev_secret_key')
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'dev_jwt_secret_key')
     JWT_TOKEN_LOCATION = ['headers']
