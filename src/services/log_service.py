@@ -45,7 +45,7 @@ def get_all_logs():
         return jsonify({"description": "Unauthorized"}), 401
     logs = Log.query.all()
     logs_dict = [log.to_dict() for log in logs]
-    return (logs_dict, 200)
+    return jsonify(logs_dict), 200
 
 def get_all_user_logs(user_id):
     logged_user = get_current_user()
@@ -73,7 +73,7 @@ def get_all_user_logs(user_id):
         descriptions = Description.query.filter_by(log_id = log_dict["log_id"])
         description_to_dict = descriptions.to_dict()
         log_dict["description"] = description_to_dict
-    return (logs_dict, 200)
+    return jsonify(logs_dict), 200
 
 def get_all_me_logs():
     logged_user = get_current_user()
@@ -189,7 +189,7 @@ def get_single_log(log_id):
         if not logged_user.is_administrator():
             return jsonify({"description": "Unauthorized"}), 401
 
-    return (searched_log.to_dict(), 200)
+    return jsonify(searched_log.to_dict()), 200
 
 
 def change_single_log(data, log_id):
@@ -199,9 +199,9 @@ def change_single_log(data, log_id):
 
 
     if not logged_user:
-        return jsonify({"description": "not user found"}, 404)
+        return jsonify({"description": "not user found"}), 404
     if not changed_log:
-        return jsonify({"description": "not log found"}, 404)
+        return jsonify({"description": "not log found"}), 404
 
     new_log_information["log_id"] = log_id
     user_id = changed_log.user_id
@@ -248,16 +248,16 @@ def change_single_log(data, log_id):
                 db.session.commit()
                 new_log_information["feel"] = feels
 
-    return (new_log_information, 200)
+    return jsonify(new_log_information), 200
 
 def delete_single_log(log_id):
     logged_user = get_current_user()
     deleted_log = Log.query.get(log_id)
 
     if not logged_user:
-        return jsonify({"description": "not user found"}, 404)
+        return jsonify({"description": "not user found"}), 404
     if not deleted_log:
-        return jsonify({"description": "not log found"}, 404)
+        return jsonify({"description": "not log found"}), 404
 
     user_id = deleted_log.user_id
     searched_user = User.query.get(user_id)

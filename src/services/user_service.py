@@ -51,8 +51,8 @@ def get_single_user(user_id):
         return jsonify({"description": "Unauthorized"}), 401
 
     if checked_user is None:
-        return jsonify({"description": "User not found"}, 404)
-    return jsonify(checked_user.to_dict(), 200)
+        return jsonify({"description": "User not found"}), 404
+    return jsonify(checked_user.to_dict()), 200
 
 def get_me_user():
     logged_user = get_current_user()
@@ -84,7 +84,7 @@ def change_single_user(data, user_id):
 
         db.session.commit()
 
-        return jsonify(changed_user.to_dict(), 200)
+        return jsonify(changed_user.to_dict()), 200
 
     except:
         return jsonify({"description": "Unauthorized, try another email"})
@@ -105,7 +105,7 @@ def change_me_user(data):
 
         db.session.commit()
 
-        return jsonify(logged_user.to_dict(), 200)
+        return jsonify(logged_user.to_dict()), 200
 
     except:
         return jsonify({"description": "Unauthorized, try another email"})
