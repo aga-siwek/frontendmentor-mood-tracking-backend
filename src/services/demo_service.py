@@ -80,27 +80,27 @@ def _generate_log_dates(rng):
     log_dates = []
     current = DEMO_START_DATE + timedelta(days=rng.randint(0, 14))
 
-    while current <= end:
-        streak = rng.choices(
-            [1, 2, 3, 5, 7, 14],
-            weights=[20, 25, 25, 15, 10, 5]
-        )[0]
+    phase_config = {
+        "inactive": {"prob": 0.0,  "duration": (14, 45)},
+        "low":      {"prob": 0.15, "duration": (7, 21)},
+        "medium":   {"prob": 0.45, "duration": (7, 21)},
+        "high":     {"prob": 0.75, "duration": (5, 14)},
+    }
 
-        for _ in range(streak):
+    while current <= end:
+        phase = rng.choices(
+            ["inactive", "low", "medium", "high"],
+            weights=[20, 30, 35, 15]
+        )[0]
+        cfg = phase_config[phase]
+        duration = rng.randint(*cfg["duration"])
+
+        for _ in range(duration):
             if current > end:
                 break
-            if rng.random() > 0.3:
+            if cfg["prob"] > 0 and rng.random() < cfg["prob"]:
                 log_dates.append(datetime.combine(current, datetime.min.time()))
             current += timedelta(days=1)
-
-        if current > end:
-            break
-
-        gap = rng.choices(
-            [1, 2, 3, 5, 7, 14, 30],
-            weights=[10, 15, 20, 20, 15, 15, 5]
-        )[0]
-        current += timedelta(days=gap)
 
     # ensure last log is within 3 days of yesterday
     if not log_dates or max(d.date() for d in log_dates) < end - timedelta(days=3):
