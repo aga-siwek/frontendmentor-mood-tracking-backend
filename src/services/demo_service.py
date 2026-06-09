@@ -81,16 +81,16 @@ def _generate_log_dates(rng):
     current = DEMO_START_DATE + timedelta(days=rng.randint(0, 14))
 
     phase_config = {
-        "inactive": {"prob": 0.0,  "duration": (14, 45)},
-        "low":      {"prob": 0.15, "duration": (7, 21)},
-        "medium":   {"prob": 0.45, "duration": (7, 21)},
-        "high":     {"prob": 0.75, "duration": (5, 14)},
+        "inactive": {"log_chance": 0.0,  "duration": (5, 10)},
+        "low":      {"log_chance": 0.2,  "duration": (5, 14)},
+        "medium":   {"log_chance": 0.45, "duration": (5, 14)},
+        "high":     {"log_chance": 0.75, "duration": (3, 10)},
     }
 
     while current <= end:
         phase = rng.choices(
             ["inactive", "low", "medium", "high"],
-            weights=[20, 30, 35, 15]
+            weights=[15, 35, 35, 15]
         )[0]
         cfg = phase_config[phase]
         duration = rng.randint(*cfg["duration"])
@@ -98,7 +98,7 @@ def _generate_log_dates(rng):
         for _ in range(duration):
             if current > end:
                 break
-            if cfg["prob"] > 0 and rng.random() < cfg["prob"]:
+            if cfg["log_chance"] > 0 and rng.random() < cfg["log_chance"]:
                 log_dates.append(datetime.combine(current, datetime.min.time()))
             current += timedelta(days=1)
 
