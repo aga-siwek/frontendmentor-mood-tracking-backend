@@ -103,7 +103,7 @@ Creates a temporary account pre-filled with mood data from 2024 to the current d
 
 On `POST /logout` the demo account and all its data are permanently deleted.
 
-Rate limited to 15 requests per hour per IP.
+Rate limited to 3 requests per minute per IP.
 
 ## How to run server
 
