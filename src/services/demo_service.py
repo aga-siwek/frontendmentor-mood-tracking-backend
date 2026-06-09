@@ -102,14 +102,34 @@ def _generate_log_dates(rng):
                 log_dates.append(datetime.combine(current, datetime.min.time()))
             current += timedelta(days=1)
 
-    # ensure last log is within 3 days of yesterday
-    if not log_dates or max(d.date() for d in log_dates) < end - timedelta(days=3):
-        for delta in sorted(rng.sample(range(0, 4), rng.randint(2, 4))):
-            day = end - timedelta(days=delta)
-            if not any(d.date() == day for d in log_dates):
-                log_dates.append(datetime.combine(day, datetime.min.time()))
-        log_dates.sort()
+    # ensure at least 20 logs per month (proportional for partial months)
+    existing_days = {d.date() for d in log_dates}
+    month_start = DEMO_START_DATE.replace(day=1)
+    while month_start <= end:
+        if month_start.month == 12:
+            next_month = month_start.replace(year=month_start.year + 1, month=1)
+        else:
+            next_month = month_start.replace(month=month_start.month + 1)
+        month_end = min(next_month - timedelta(days=1), end)
 
+        days_in_range = (month_end - month_start).days + 1
+        minimum = min(20, days_in_range)
+        month_logs = [d for d in existing_days if month_start <= d <= month_end]
+        deficit = minimum - len(month_logs)
+
+        if deficit > 0:
+            available = [
+                month_start + timedelta(days=i)
+                for i in range(days_in_range)
+                if month_start + timedelta(days=i) not in existing_days
+            ]
+            for d in rng.sample(available, min(deficit, len(available))):
+                existing_days.add(d)
+                log_dates.append(datetime.combine(d, datetime.min.time()))
+
+        month_start = next_month
+
+    log_dates.sort()
     return log_dates
 
 
