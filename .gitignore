@@ -5,3 +5,4 @@ __pycache__/
 *.pyo
 .venv/
 .DS_Store
+cleanup_demo_accounts.py

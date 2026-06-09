@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-from src.services import user_service
+from src.services import user_service, demo_service
 
 user_app = Blueprint("user", __name__)
 
@@ -64,3 +64,15 @@ def delete_single_user(user_id):
 @jwt_required()
 def delete_me_user():
     return user_service.delete_me_user()
+
+
+@user_app.route("/logout", methods=["POST"])
+@jwt_required()
+def logout():
+    logged_user = user_service.get_current_user()
+    if not logged_user:
+        return jsonify({"description": "user not found"}), 404
+    if logged_user.is_demo:
+        demo_service.delete_demo_account(logged_user)
+        return jsonify({"description": "demo account removed"}), 200
+    return jsonify({"description": "logged out"}), 200

@@ -3,17 +3,21 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from src.database import db
 from src.bcrypt import bcrypt
+from src.limiter import limiter
 from src.routes.user_route import user_app
 from src.routes.log_route import log_app
+from src.routes.demo_route import demo_app
 
 
 
 app = Flask(__name__)
 app.register_blueprint(log_app)
 app.register_blueprint(user_app)
+app.register_blueprint(demo_app)
 app.config.from_object("config.Config")
 db.init_app(app)
 bcrypt.init_app(app)
+limiter.init_app(app)
 jwt = JWTManager()
 jwt.init_app(app)
 CORS(app)
@@ -23,6 +27,6 @@ with app.app_context():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8080)
 
 

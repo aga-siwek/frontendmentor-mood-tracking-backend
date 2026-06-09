@@ -95,6 +95,16 @@ SECRET_KEY=your_secret_key
 JWT_SECRET_KEY=your_jwt_secret_key
 ```
 
+## Demo Account
+
+`POST /demo/login` — no body required.
+
+Creates a temporary account pre-filled with mood data from 2024 to the current date and returns a JWT token. Each visitor gets an isolated account so multiple people can use the demo simultaneously without interfering with each other.
+
+On `POST /logout` the demo account and all its data are permanently deleted.
+
+Rate limited to 5 requests per hour per IP.
+
 ## How to run server
 
 you can start flask application by several different way:
