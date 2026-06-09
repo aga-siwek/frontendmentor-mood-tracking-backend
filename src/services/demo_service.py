@@ -78,17 +78,37 @@ fake = Faker()
 def _generate_log_dates(rng):
     end = date.today() - timedelta(days=1)
     log_dates = []
-    current = DEMO_START_DATE + timedelta(days=rng.randint(0, 20))
+    current = DEMO_START_DATE + timedelta(days=rng.randint(0, 14))
 
     while current <= end:
-        active_length = rng.randint(5, 20)
-        for _ in range(active_length):
+        streak = rng.choices(
+            [1, 2, 3, 5, 7, 14],
+            weights=[20, 25, 25, 15, 10, 5]
+        )[0]
+
+        for _ in range(streak):
             if current > end:
                 break
-            if rng.random() > 0.2:
+            if rng.random() > 0.3:
                 log_dates.append(datetime.combine(current, datetime.min.time()))
             current += timedelta(days=1)
-        current += timedelta(days=rng.randint(10, 50))
+
+        if current > end:
+            break
+
+        gap = rng.choices(
+            [1, 2, 3, 5, 7, 14, 30],
+            weights=[10, 15, 20, 20, 15, 15, 5]
+        )[0]
+        current += timedelta(days=gap)
+
+    # ensure last log is within 3 days of yesterday
+    if not log_dates or max(d.date() for d in log_dates) < end - timedelta(days=3):
+        for delta in sorted(rng.sample(range(0, 4), rng.randint(2, 4))):
+            day = end - timedelta(days=delta)
+            if not any(d.date() == day for d in log_dates):
+                log_dates.append(datetime.combine(day, datetime.min.time()))
+        log_dates.sort()
 
     return log_dates
 
